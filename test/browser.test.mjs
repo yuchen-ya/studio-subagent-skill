@@ -58,3 +58,12 @@ test('reconnecting to a selected project preserves that project', async () => {
   await browser.close();
   assert.equal(urls.length, 2);
 });
+
+test('a fresh connection can return to an unfinished job in the same temporary tab', async () => {
+  const urls = [welcome];
+  const browser = browserWithTabs(urls);
+  await browser.connect(`${build}/pending-job`);
+  assert.deepEqual(urls, [`${build}/pending-job`]);
+  await browser.close();
+  assert.deepEqual(urls, []);
+});

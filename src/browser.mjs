@@ -59,7 +59,8 @@ export class Browser {
     return this.result('browser_run_code_unsafe', { code: guarded });
   }
 
-  async connect() {
+  async connect(startUrl = 'https://aistudio.google.com/apps') {
+    appId(startUrl);
     const tabs = await this.tool('browser_tabs', { action: 'list' });
     const url = await this.getUrl();
     const placeholder = url.startsWith('chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html');
@@ -72,7 +73,7 @@ export class Browser {
         const current = tabs.match(/^- (\d+): \(current\)/m);
         await this.tool('browser_tabs', { action: 'select', index: index - (placeholder && Number(current[1]) < index ? 1 : 0) });
       } else {
-        await this.tool('browser_navigate', { url: 'https://aistudio.google.com/apps' });
+        await this.tool('browser_navigate', { url: startUrl });
         this.ownsTab = placeholder;
       }
     } else {

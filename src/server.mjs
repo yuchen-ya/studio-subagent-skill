@@ -26,7 +26,17 @@ const server = http.createServer(async (req, res) => {
     const { operation, args = {} } = JSON.parse(body);
     const operations = {
       health: async () => ({ ready: true, pid: process.pid }),
-      connect: () => browser.connect(),
+      connect: async () => {
+        let startUrl = 'https://aistudio.google.com/apps';
+        try {
+          const { id } = JSON.parse(await fs.readFile(path.join(runtimeDir, 'active.json'), 'utf8'));
+          const job = await agent.readJob(id);
+          if (['submitting', 'submission_unknown', 'running', 'needs_attention', 'completed'].includes(job.status)) startUrl = job.url;
+        } catch (error) {
+          if (error.code !== 'ENOENT') throw error;
+        }
+        return browser.connect(startUrl);
+      },
       inspect: () => agent.inspect(),
       submit: () => agent.submit(args),
       status: () => agent.status(args.id),

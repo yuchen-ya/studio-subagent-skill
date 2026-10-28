@@ -130,9 +130,14 @@ export class AiStudioAgent {
     const state = await this.inspect();
     const before = await downloadInventory(job.downloadDir);
     await this.browser.run(`async page => {
-      await page.getByRole('radio',{name:'Code',exact:true}).click();
-      await page.getByRole('button',{name:'Export options',exact:true}).click();
-      await page.getByRole('menuitem',{name:/^Download as \\.zip file/}).click();
+      for (const control of [
+        page.getByRole('radio',{name:'Code',exact:true}),
+        page.getByRole('button',{name:'Export options',exact:true}),
+        page.getByRole('menuitem',{name:/^Download as \\.zip file/}),
+      ]) {
+        if (!await control.isEnabled()) throw new Error('The export control is disabled.');
+        await control.click({force:true,timeout:10000});
+      }
       return {exportRequested:true};
     }`);
     const zipPath = await findDownload(job.downloadDir, before, state.title);
