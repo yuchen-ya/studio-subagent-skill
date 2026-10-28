@@ -60,12 +60,21 @@ export class Browser {
   }
 
   async connect() {
-    await this.tool('browser_tabs', { action: 'list' });
+    const tabs = await this.tool('browser_tabs', { action: 'list' });
     const url = await this.getUrl();
-    if (url === 'about:blank') {
-      await this.tool('browser_navigate', { url: 'https://aistudio.google.com/apps' });
-    } else if (url.startsWith('chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/')) {
-      await this.tool('browser_tabs', { action: 'new', url: 'https://aistudio.google.com/apps' });
+    const placeholder = url.startsWith('chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html');
+    if (url === 'about:blank' || placeholder) {
+      const existing = tabs.match(/^- (\d+):[^\n]*\]\(https:\/\/(?:aistudio\.google\.com|ai\.studio)\/apps(?:[/?#][^\s)]*)?\)$/m);
+      if (existing) {
+        // Close this connection's welcome page, never an existing user tab.
+        if (placeholder) await this.tool('browser_tabs', { action: 'close' });
+        const index = Number(existing[1]);
+        const current = tabs.match(/^- (\d+): \(current\)/m);
+        await this.tool('browser_tabs', { action: 'select', index: index - (placeholder && Number(current[1]) < index ? 1 : 0) });
+      } else {
+        await this.tool('browser_navigate', { url: 'https://aistudio.google.com/apps' });
+        this.ownsTab = placeholder;
+      }
     } else {
       appId(url);
     }
@@ -77,6 +86,13 @@ export class Browser {
   }
 
   async close() {
-    await this.client.close();
+    try {
+      if (this.ownsTab) {
+        appId(await this.getUrl());
+        await this.tool('browser_tabs', { action: 'close' });
+      }
+    } finally {
+      await this.client.close();
+    }
   }
 }
