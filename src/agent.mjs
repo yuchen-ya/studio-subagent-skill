@@ -73,6 +73,9 @@ export class AiStudioAgent {
       attachments: files.map(file => path.resolve(file)), accepted: false,
     };
     await this.writeJob(job);
+    if (attachments.length) {
+      await this.browser.run('async page => { await page.bringToFront(); return {readyForUpload:true}; }');
+    }
     for (const file of attachments) await this.browser.tool('browser_drop', { target: COMPOSER, paths: [file] });
     if (attachments.length) {
       await this.browser.run(`async page => {
