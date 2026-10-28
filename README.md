@@ -17,6 +17,8 @@ node src/cli.mjs connect
 
 Skill 安装到 `$CODEX_HOME/skills/aistudio-subagent`（默认 `~/.codex/skills/aistudio-subagent`），通过 `$aistudio-subagent` 调用。
 
+若先通过 Codex 的 skill-installer 单独安装了 skill 目录，仍需执行上述克隆、`npm ci` 和 `npm run install-skill`，以安装运行项目并绑定其位置。
+
 首次连接由用户在扩展页允许。可选择现有 Build 标签页或空白页，程序会在同一 Chrome 配置中打开 AI Studio。扩展权限覆盖整个浏览器；代码的 Build URL 检查不构成浏览器权限隔离。登录和验证码需用户处理。
 
 重启时复用授权：设置 `PLAYWRIGHT_MCP_EXTENSION_TOKEN` 环境变量，或将扩展令牌保存在用户数据目录下的 `extension-token.txt`。令牌只在本机使用，不要放入源码或问题报告。

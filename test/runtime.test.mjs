@@ -65,3 +65,18 @@ test('skill installation resolves its project without machine-specific paths', a
     await fs.rm(directory, { recursive: true, force: true });
   }
 });
+
+test('a standalone skill download explains the missing runtime setup', async () => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'studio-unbound-skill-'));
+  const source = fileURLToPath(new URL('../skills/aistudio-subagent', import.meta.url));
+  const destination = path.join(directory, 'skills/aistudio-subagent');
+  try {
+    await fs.cp(source, destination, { recursive: true });
+    const result = run(path.join(destination, 'scripts/run.mjs'), ['help'], directory, {});
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /npm ci and npm run install-skill/);
+    assert.doesNotMatch(result.stderr, /MODULE_NOT_FOUND/);
+  } finally {
+    await fs.rm(directory, { recursive: true, force: true });
+  }
+});

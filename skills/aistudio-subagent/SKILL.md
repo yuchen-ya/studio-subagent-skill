@@ -7,6 +7,19 @@ description: 将文件修改任务委派给用户已登录 Chrome 中的 Google 
 
 使用本 skill 的 `scripts/run.mjs` 调用本机项目，通过 Playwright Extension 连接现有 Chrome；不启动另一个测试浏览器，不复制登录数据。
 
+## 首次安装
+
+单独从 GitHub 安装 skill 目录不会下载项目运行依赖。若缺少本 skill 目录下的 `project.json` 或脚本提示运行项目未安装，先在用户选定的位置执行：
+
+```sh
+git clone https://github.com/yuchen-ya/studio-subagent-skill.git
+cd studio-subagent-skill
+npm ci
+npm run install-skill
+```
+
+最后一步会将已安装 skill 绑定到此克隆目录。安装依赖后再执行下面的工作流。
+
 ## 执行
 
 用 `node <本技能绝对路径>/scripts/run.mjs <命令>`。先执行 `help` 查看参数。
