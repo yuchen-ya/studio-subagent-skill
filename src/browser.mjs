@@ -30,6 +30,7 @@ export class Browser {
   }
 
   async tool(name, args = {}) {
+    if (name === 'browser_drop') await this.run('async page => true');
     const result = await this.client.callTool({ name, arguments: args }, undefined, { timeout: 120000 });
     let text = result.content.filter(item => item.type === 'text').map(item => item.text).join('\n');
     if (this.extensionToken) text = text.replaceAll(this.extensionToken, '[redacted]');
@@ -52,6 +53,7 @@ export class Browser {
     const guarded = `async page => {
       const url = new URL(page.url());
       if (url.protocol !== 'https:' || !['aistudio.google.com','ai.studio'].includes(url.hostname) || !/^\\/apps(?:\\/|$)/.test(url.pathname)) throw new Error('The selected tab is not AI Studio Build.');
+      await page.bringToFront();
       return (${code})(page);
     }`;
     return this.result('browser_run_code_unsafe', { code: guarded });
