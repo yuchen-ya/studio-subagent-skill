@@ -7,7 +7,8 @@
 需要 Node.js 22+，以及安装在登录账号所在 Chrome 配置中的 [Playwright Extension](https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadbfplnigmagldckm)。
 
 ```sh
-cd studio-subagent
+git clone https://github.com/yuchen-ya/studio-subagent-skill.git
+cd studio-subagent-skill
 npm ci
 npm run install-skill
 node src/cli.mjs start
