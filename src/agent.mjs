@@ -73,8 +73,8 @@ export class AiStudioAgent {
       attachments: files.map(file => path.resolve(file)), accepted: false,
     };
     await this.writeJob(job);
-    for (const file of attachments) await this.browser.tool('browser_drop', { target: COMPOSER, paths: [file] });
     if (attachments.length) {
+      await this.browser.upload(attachments);
       await this.browser.run(`async page => {
         for (const name of ${JSON.stringify(names)}) {
           await page.getByRole('button',{name,exact:false})
@@ -94,7 +94,9 @@ export class AiStudioAgent {
     await fs.writeFile(activeFile, JSON.stringify({ id }));
     try {
       await this.browser.run(`async page => {
-        await page.getByRole('button',{name:/^(Build|Send|Run)$/}).click({timeout:10000});
+        const send = page.getByRole('button',{name:/^(Build|Send|Run)$/});
+        if (!await send.isEnabled()) throw new Error('The send button is disabled.');
+        await send.click({force:true,timeout:10000});
         return {clicked:true};
       }`);
     } catch (error) {

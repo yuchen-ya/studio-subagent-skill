@@ -3,7 +3,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport, getDefaultEnvironment } from '@modelcontextprotocol/sdk/client/stdio.js';
-import { appId } from './state.mjs';
+import mime from 'mime-types';
+import { COMPOSER, appId } from './state.mjs';
 
 export class Browser {
   constructor(runtimeDir) {
@@ -30,7 +31,6 @@ export class Browser {
   }
 
   async tool(name, args = {}) {
-    if (name === 'browser_drop') await this.run('async page => true');
     const result = await this.client.callTool({ name, arguments: args }, undefined, { timeout: 120000 });
     let text = result.content.filter(item => item.type === 'text').map(item => item.text).join('\n');
     if (this.extensionToken) text = text.replaceAll(this.extensionToken, '[redacted]');
@@ -83,6 +83,25 @@ export class Browser {
 
   getUrl() {
     return this.evaluate('location.href');
+  }
+
+  async upload(files) {
+    const payloads = await Promise.all(files.map(async file => ({
+      name: path.basename(file), type: mime.lookup(file) || 'application/octet-stream',
+      data: (await fs.readFile(file)).toString('base64'),
+    })));
+    return this.run(`async page => page.locator(${JSON.stringify(COMPOSER)}).evaluate((node, files) => {
+      if (node.getAttribute('aria-disabled') === 'true') throw new Error('The composer is disabled.');
+      const transfer = new DataTransfer();
+      for (const file of files) {
+        const bytes = Uint8Array.from(atob(file.data), char => char.charCodeAt(0));
+        transfer.items.add(new File([bytes], file.name, {type:file.type}));
+      }
+      for (const type of ['dragenter','dragover','drop']) {
+        node.dispatchEvent(new DragEvent(type, {bubbles:true,cancelable:true,dataTransfer:transfer}));
+      }
+      return {dispatched:files.length};
+    }, ${JSON.stringify(payloads)})`);
   }
 
   async close() {
