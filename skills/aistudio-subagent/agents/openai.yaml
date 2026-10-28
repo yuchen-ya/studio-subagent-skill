@@ -1,0 +1,3 @@
+interface:
+  display_name: "AI Studio 子代理"
+  short_description: "通过当前已登录的 Chrome 向 AI Studio Build 提交文件任务并取回修改结果"

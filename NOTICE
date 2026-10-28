@@ -1,0 +1,7 @@
+The initial prototype used Agentify Desktop 0.2.4:
+https://github.com/agentify-sh/desktop
+The runtime now uses Playwright directly; no Agentify controller code is included.
+This project is distributed under MPL-2.0 and is not affiliated with Agentify.
+
+Browser access uses Microsoft's Playwright MCP and Playwright Extension.
+Those dependencies are distributed under Apache-2.0. fflate is MIT-licensed.

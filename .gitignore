@@ -1,0 +1,13 @@
+node_modules/
+.runtime/
+test-results/
+*.log
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.tgz
+skills/**/project.json
+.DS_Store
+Thumbs.db

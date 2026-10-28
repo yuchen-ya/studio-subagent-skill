@@ -1,0 +1,26 @@
+{
+  "name": "studio-subagent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MPL-2.0",
+  "engines": { "node": ">=22" },
+  "files": [
+    "src/",
+    "scripts/install-skill.mjs",
+    "skills/aistudio-subagent/SKILL.md",
+    "skills/aistudio-subagent/agents/openai.yaml",
+    "skills/aistudio-subagent/scripts/run.mjs",
+    "NOTICE"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "studio": "node src/cli.mjs",
+    "install-skill": "node scripts/install-skill.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "@playwright/mcp": "0.0.83",
+    "fflate": "0.8.3"
+  }
+}
